@@ -13,7 +13,6 @@ digit_map = {
 digit_map.default_proc = proc { |_, key| key }
 
 coords = $stdin.map do |line|
-  line
   digits = line.scan(english_digits).flatten
   (digit_map[digits.first] + digit_map[digits.last]).to_i
 end
