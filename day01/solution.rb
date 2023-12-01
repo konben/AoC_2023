@@ -1,12 +1,22 @@
-def is_digit?(c)
-  c =~ /\d/
-end
+english_digits = /(?=([1-9]|one|two|three|four|five|six|seven|eight|nine))/
+digit_map = {
+  "one" => "1",
+  "two" => "2",
+  "three" => "3",
+  "four" => "4",
+  "five" => "5",
+  "six" => "6",
+  "seven" => "7",
+  "eight" => "8",
+  "nine" => "9",
+}
+digit_map.default_proc = proc { |_, key| key }
 
 coords = $stdin.map do |line|
-  enum = line.each_char
-  enum.find { |c| is_digit?(c) } + enum.reverse_each.find { |c| is_digit?(c) }
+  line
+  digits = line.scan(english_digits).flatten
+  (digit_map[digits.first] + digit_map[digits.last]).to_i
 end
-coords = coords.map { |c| c.to_i }
 
 puts "Sum: #{coords.sum}"
 
