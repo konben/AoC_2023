@@ -15,19 +15,53 @@ class HashSet
   def size
     @hash.size
   end
+
+  def to_a
+    @hash.keys
+  end
 end
 
-score = $stdin.each_line.sum do |line|
+class ScratchCard < Struct.new(:winning_nums, :numbers)
+  def matches
+    winning_nums & numbers
+  end
+
+  def points
+    m = matches.size
+    m > 0 ? 2**(m - 1) : 0
+  end
+end
+
+# Parse cards
+cards = $stdin.each_line.map do |line|
   line.chomp!
-  _, lists = line.split(": ")
+  game, lists = line.split(": ")
+  _, card_no = game.split(" ")
   winning_nums, numbers = lists.split(" | ")
 
   winning_nums = HashSet.new(winning_nums.split(" ").map(&:to_i))
   numbers = HashSet.new(numbers.split(" ").map(&:to_i))
 
-  matches = (winning_nums & numbers).size
-  matches > 0 ? 2**(matches - 1) : 0
+  card = ScratchCard.new(winning_nums, numbers)
+  [card_no.to_i, card]
+end
+cards = cards.to_h
+
+# Part I
+score = cards.values.map(&:points).sum
+puts "Part I: #{score}"
+
+# Part II
+copies = Hash.new(1)
+cards_total = cards.sum do |card_no, card|
+  n = copies[card_no]
+  card.matches.size.times do |i|
+    j = card_no + i + 1
+    copies[j] = copies[j] + n
+  end
+
+  n
 end
 
-puts "Part I: #{score}"
+puts "Part II: #{cards_total}"
 
